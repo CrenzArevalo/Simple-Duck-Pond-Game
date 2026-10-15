@@ -1,5 +1,7 @@
 # 🦆 Kinay's Duck Pond — Catch & Dress
 
+*GitHub repository: **Simple Duck Pond Game***
+
 A little 3D duck-catching game. Scoop cute ducks into your bucket with a net, **sell them to
 the visitors** who wander up to the pond for **6 coins each**, then spend those coins in the
 store on hats, glasses, scarves and toys to dress your ducks up.
@@ -66,8 +68,9 @@ Your coins, purchases and duck collection are saved automatically to `localStora
 ## 🔊 Sound
 
 The pond is **calm**: a gentle, looping piano soundtrack (Satie's *Gymnopédie No. 1* and the
-*Aria* from Bach's *Goldberg Variations*, both CC0) plus soft water splashes. **The ducks do not
-quack at all** — no pond chatter, no catch stinger, just relaxed paddling.
+*Aria* from Bach's *Goldberg Variations*, both CC0) plus soft water splashes. The wild ducks stay
+**quiet** as they paddle — no pond chatter — but every time you **scoop a duck into the bucket**
+you hear a quick quack, with the music still playing underneath.
 
 Everything is a **real recording sourced from the internet**, trimmed, normalised and encoded by
 `tools/build-audio.js`, then embedded as base64 data URIs so there is no fetch, no CORS, and no
@@ -150,7 +153,7 @@ This rewrites `audio/*.mp3` and `js/sounds-data.js` from the sources in `audio/_
   Hatched ducklings perch *in* the basket of twigs (the bowl rim is 0.24 high, and a duckling
   sits 0.20 above the floor so it nestles among the eggs rather than sinking into the bowl), then
   waddle down the bank following `shoreY()` into open water.
-- **Flock & difficulty** — the pond starts with 8 wild ducks and tops back up with **one newcomer
+- **Flock & difficulty** — the pond starts with 40 wild ducks and tops back up with **one newcomer
   about every minute** (`SPAWN_INTERVAL`). Ducks are deliberately lively — they cruise at
   ~0.6–1.4 and bolt at ~3.2–5.0 when the net gets near — so herding them into the hoop takes a
   little patience.
@@ -167,7 +170,8 @@ This rewrites `audio/*.mp3` and `js/sounds-data.js` from the sources in `audio/_
   (`GOLDEN_CHANCE`) and is built with a self-lit emissive coat plus a shine rig — an additive halo
   sprite, a warm `PointLight` and seven orbiting sparkles — animated in `DuckKit.tickDuck()`.
 - **Audio** — a gentle music bed loops with a short crossfade between two CC0 piano tracks. All
-  effects are real recordings, so the ducks (deliberately) never quack.
+  effects are real recordings; the wild flock stays silent so the pond feels calm, and a single
+  quack plays the moment a duck is scooped into the bucket.
 - Three.js r159's UMD build prints a deprecation warning about `build/three.min.js` being
   removed in r160. That warning is expected and harmless.
 
