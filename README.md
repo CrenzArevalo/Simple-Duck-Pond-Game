@@ -1,4 +1,4 @@
-# 🦆 Mini Duck Pond — Catch & Dress
+# 🦆 Mini Duck Pond Game — Catch & Dress
 
 *GitHub repository: **Simple Duck Pond Game***
 
