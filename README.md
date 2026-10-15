@@ -1,4 +1,4 @@
-# 🦆 Kinay's Duck Pond — Catch & Dress
+# 🦆 Mini Duck Pond — Catch & Dress
 
 *GitHub repository: **Simple Duck Pond Game***
 
