@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#86c96a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Kinay's Duck Pond</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<canvas id="scene"></canvas>
+
+<div id="ui">
+  <header id="hud">
+    <div class="brand">
+      <span class="brand-duck">🦆</span>
+      <div class="brand-text">
+        <strong>Kinay's Duck Pond</strong>
+        <small>Catch &amp; Dress</small>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat coin">
+        <svg viewBox="0 0 24 24" class="ico" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="#f6b93b" stroke="#d9902a" stroke-width="2"/>
+          <circle cx="12" cy="12" r="6.5" fill="none" stroke="#f9d97b" stroke-width="1.6"/>
+          <path d="M12 7.4v9.2M14.6 9.4c-.7-.9-1.6-1.2-2.6-1.2-1.2 0-2.2.6-2.2 1.7 0 1 .8 1.5 2.2 1.8l.8.2c1.3.3 2.1.8 2.1 1.8 0 1.1-1 1.8-2.4 1.8-1.2 0-2.2-.4-2.9-1.3"
+                fill="none" stroke="#8a5a12" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span id="coinCount">0</span>
+      </div>
+      <div class="stat">
+        <span class="ico emoji">🪣</span>
+        <span id="duckCount">0</span>
+      </div>
+    </div>
+
+    <nav class="actions">
+      <button class="btn btn-store" id="openStore" title="Store (B)">
+        <span class="btn-emoji">🛍️</span><span class="btn-label">Store</span>
+      </button>
+      <button class="btn btn-ducks" id="openDucks" title="My Ducks (D)">
+        <span class="btn-emoji">🐣</span><span class="btn-label">My Ducks</span>
+      </button>
+      <button class="icon-btn" id="toggleSound" title="Sound" aria-pressed="true">🔊</button>
+      <button class="icon-btn" id="openHelp" title="How to play">❓</button>
+    </nav>
+  </header>
+
+  <div id="hint" class="hint">Click the water to scoop your net · Sell ducks to visitors · Rare &amp; golden ducks sell for ×2</div>
+  <button id="scoopBtn" class="scoop-btn" aria-label="Scoop">🥅 Scoop</button>
+
+  <div id="buyerPrompt" class="buyer-prompt hide" aria-hidden="true">
+    <div class="bp-bubble">
+      <span class="bp-emoji">🧺</span>
+      <span id="buyerText">A visitor wants to buy a duck!</span>
+    </div>
+    <button class="btn btn-sell" id="sellBtn">Sell for 6 🪙</button>
+  </div>
+</div>
+
+<div id="fx"></div>
+<div id="toasts"></div>
+<div class="vignette"></div>
+
+<!-- ============ START ============ -->
+<div class="overlay show" id="startScreen">
+  <div class="card start-card">
+    <div class="start-duck">🦆</div>
+    <h1>Kinay's Duck Pond</h1>
+    <p class="tagline">Scoop up the cutest ducks in the pond, sell them to visitors, then dress your favourites up.</p>
+    <ul class="howto">
+      <li><b>Move</b> your net with the mouse</li>
+      <li><b>Click</b> the water to scoop — caught ducks land in your <b>🪣 bucket</b></li>
+      <li>Sell ducks to the <b>visitors</b> who wander up = <b class="coin-txt">6 coins</b> each 🪙 (<b>rare</b> &amp; <b>golden</b> ducks pay <b>double</b>!)</li>
+      <li>Watch the <b>nest</b> — eggs crack and ducklings waddle into the pond</li>
+      <li>Spend coins in the <b>🛍️ Store</b> to buy cute outfits</li>
+      <li>Dress your ducks in <b>🐣 My Ducks</b></li>
+    </ul>
+    <button class="btn btn-primary big" id="playBtn">Let's go! 🌊</button>
+    <div class="start-foot">
+      <label class="check"><input type="checkbox" id="freshStart" /> <span>Start a brand new pond (erases save)</span></label>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STORE ============ -->
+<div class="modal" id="storeModal" aria-hidden="true">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2><span class="h-emoji">🛍️</span> Cute Store</h2>
+      <div class="coin-pill"><span>🪙</span><b id="storeCoins">0</b></div>
+      <button class="icon-btn close" data-close="storeModal" aria-label="Close">✕</button>
+    </div>
+    <div class="tabs" id="storeTabs"></div>
+    <div class="sheet-body">
+      <div class="grid" id="storeGrid"></div>
+    </div>
+    <div class="sheet-foot" id="storeFoot">Sell ducks to visitors to earn 6 coins each! 🪙</div>
+  </div>
+</div>
+
+<!-- ============ MY DUCKS ============ -->
+<div class="modal" id="ducksModal" aria-hidden="true">
+  <div class="sheet wide">
+    <div class="sheet-head">
+      <h2><span class="h-emoji">🐣</span> My Ducks</h2>
+      <div class="coin-pill"><span>🪙</span><b id="ducksCoins">0</b></div>
+      <button class="icon-btn close" data-close="ducksModal" aria-label="Close">✕</button>
+    </div>
+    <div class="myducks">
+      <aside class="ducklist" id="duckList"></aside>
+      <section class="dressup">
+        <div class="preview-wrap">
+          <canvas id="previewCanvas"></canvas>
+          <div class="preview-hint">drag to spin</div>
+          <div class="preview-empty" id="previewEmpty">
+            <div class="pe-emoji">🦆</div>
+            <p>No ducks yet!</p>
+            <small>Go scoop some up in the pond.</small>
+          </div>
+        </div>
+        <div class="dressup-panel">
+          <div class="dressup-title">
+            <b id="dressName">—</b>
+            <span class="dress-actions">
+              <button class="btn tiny sell" id="sellDuck" hidden>Sell to visitor · 6 🪙</button>
+              <button class="btn tiny ghost" id="releaseDuck">Release to pond</button>
+            </span>
+          </div>
+          <div class="slots" id="slotRow"></div>
+          <div class="owned-head">Your wardrobe <span id="ownedCount"></span></div>
+          <div class="owned" id="ownedGrid"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HELP ============ -->
+<div class="modal" id="helpModal" aria-hidden="true">
+  <div class="sheet narrow">
+    <div class="sheet-head">
+      <h2><span class="h-emoji">❓</span> How to play</h2>
+      <button class="icon-btn close" data-close="helpModal" aria-label="Close">✕</button>
+    </div>
+    <div class="sheet-body help-body">
+      <h3>🕹️ Catching ducks</h3>
+      <p>Move your <b>net</b> with the mouse (or your finger). <b>Click / tap</b> the water and the net will scoop. Any duck inside the net when it dips gets caught.</p>
+      <p>Ducks are shy — they'll paddle away when the net gets close. Herd them toward the shore to corner them!</p>
+      <p>Every duck you catch tumbles straight into your <b>🪣 bucket</b> in the corner of the pond.</p>
+
+      <h3>🧺 Visitors &amp; coins</h3>
+      <p>Catching alone doesn't pay — you earn coins by <b>selling ducks</b>. Visitors wander up to the pond every so often; when one arrives, a <b>Sell</b> button appears above them. Selling a duck earns you <b>6 coins</b>. You can also sell the duck you have selected in <b>🐣 My Ducks</b>.</p>
+      <p>Some ducks are worth more: <b>rare</b> ducks (like the Lagoon) and the shimmering <b>golden</b> duck sell for <b>double — 12 coins</b>. 💎</p>
+
+      <h3>🥚 The nest</h3>
+      <p>A nest of duck eggs sits by the pond. The eggs wobble, crack open, and the ducklings waddle straight into the water — then you can catch them like any other duck.</p>
+
+      <h3>💎 Rare ducks</h3>
+      <p>Most ducks are worth <b>6 coins</b>, but <b>rare</b> ducks (and the dazzling <b>golden</b> duck) pay <b>double — 12 coins</b>. You'll spot a golden duck easily: it <b>shines brightly</b>, glowing with a warm halo and twinkling sparks. Only one golden duck appears per game, so catch it if you can!</p>
+
+      <h3>🛍️ The Store</h3>
+      <p>Open the store with the <b>Store</b> button (or press <b>B</b>) to buy cute hats, glasses, scarves and toys. Items you buy go into your <b>wardrobe</b> and can be worn by any duck.</p>
+
+      <h3>🎨 Duck patterns</h3>
+      <p>Every duck wears its own coat — polka dots, stripes, waves, checker, hearts, stars, speckles or a glowing <b>radiant</b> gradient — in all sorts of colours.</p>
+
+      <h3>🐣 Dressing up</h3>
+      <p>Open <b>My Ducks</b> (or press <b>D</b>). Pick a duck, drag the preview to spin it, and click a wardrobe item to put it on. You can release a dressed duck back into the pond so it swims around in style.</p>
+
+      <h3>🔊 Sound</h3>
+      <p>A gentle piano soundtrack plays while you paddle. The ducks themselves stay <b>quiet</b> — no quacking at all. You'll only hear the soft splash of your net and the water.</p>
+
+      <h3>⌨️ Shortcuts</h3>
+      <p><b>B</b> store &nbsp;·&nbsp; <b>D</b> my ducks &nbsp;·&nbsp; <b>Space</b> scoop &nbsp;·&nbsp; <b>M</b> mute &nbsp;·&nbsp; <b>Esc</b> close</p>
+      <p class="muted small">Your pond is saved automatically in this browser.</p>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/sounds-data.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/items.js"></script>
+<script src="js/renderer-utils.js"></script>
+<script src="js/preview.js"></script>
+<script src="js/world.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

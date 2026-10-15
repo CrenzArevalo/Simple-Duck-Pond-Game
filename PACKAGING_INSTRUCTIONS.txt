@@ -1,0 +1,16 @@
+﻿Kinay's Duck Pond — Android APK packaging (ready)
+
+What I've done
+- Added manifest.json in the root
+- Added PWA meta tags to index.html (manifest, theme-color, mobile-web-app-capable, etc.)
+- Created zip: Kinay's-Duck-Pond-PWA.zip (~24MB)
+
+Quickest way: PWABuilder (no Android Studio needed)
+1. Go to https://www.pwabuilder.com/
+2. Drag/drop or upload Kinay's-Duck-Pond-PWA.zip
+3. PWABuilder will analyze and show "Package for Stores" -> Android
+4. Generate Android APK/AAB
+5. Download and sideload on Android
+
+Zip location
+C:\Users\aeval\Desktop\Programmed Games\Kinay's-Duck-Pond-PWA.zip

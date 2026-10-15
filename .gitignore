@@ -1,0 +1,21 @@
+# Build artifacts / packaged output (regenerate with tools or Compress-Archive)
+Kinay's-Duck-Pond-PWA.zip
+*.apk
+*.aab
+
+# Local screenshots / debugging captures
+screenshot-*.png
+
+# Node / tooling
+node_modules/
+package-lock.json
+
+# Temporary audio working files (source audio in audio/_src is kept)
+audio/_src/_tmp/
+
+# OS / editor cruft
+Thumbs.db
+.DS_Store
+*.log
+.vscode/*
+!.vscode/extensions.json
