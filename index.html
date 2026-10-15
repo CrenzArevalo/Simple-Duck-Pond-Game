@@ -8,6 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <title>Kinay's Duck Pond</title>
 <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -176,7 +177,7 @@
       <p>Open <b>My Ducks</b> (or press <b>D</b>). Pick a duck, drag the preview to spin it, and click a wardrobe item to put it on. You can release a dressed duck back into the pond so it swims around in style.</p>
 
       <h3>🔊 Sound</h3>
-      <p>A gentle piano soundtrack plays while you paddle. The ducks themselves stay <b>quiet</b> — no quacking at all. You'll only hear the soft splash of your net and the water.</p>
+      <p>A gentle piano soundtrack plays while you paddle. The ducks themselves stay <b>quiet</b> as they swim, and every duck you scoop into the bucket gives a little <b>quack</b> over the music.</p>
 
       <h3>⌨️ Shortcuts</h3>
       <p><b>B</b> store &nbsp;·&nbsp; <b>D</b> my ducks &nbsp;·&nbsp; <b>Space</b> scoop &nbsp;·&nbsp; <b>M</b> mute &nbsp;·&nbsp; <b>Esc</b> close</p>
@@ -193,5 +194,14 @@
 <script src="js/preview.js"></script>
 <script src="js/world.js"></script>
 <script src="js/game.js"></script>
+<script>
+// Register the offline service worker. It only runs when the game is served
+// over http(s) (e.g. GitHub Pages); on file:// this silently does nothing.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
+</script>
 </body>
 </html>

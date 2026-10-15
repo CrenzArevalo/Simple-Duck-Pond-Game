@@ -89,6 +89,9 @@ can't be decoded, so the game is never silent.
 index.html               page skeleton, HUD, modals, script order
 css/style.css            all the pastel/rounded UI styling
 vendor/three.min.js      Three.js r159 (UMD, vendored so it runs offline)
+manifest.json            PWA manifest (fullscreen, landscape)
+sw.js                    offline service worker (precache + cache-first)
+icon-*.png               PWA / Android icons (192, 512, maskable)
 
 js/sounds-data.js        AUTO-GENERATED base64 audio bundle (~600 KB, 11 clips)
 js/audio.js              WebAudio engine: music player + real samples + synth fallback

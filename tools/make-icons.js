@@ -1,6 +1,10 @@
-/* Generates icon-192.png and icon-512.png for the PWA / Android package.
+/* Generates the PWA / Android icons:
+     icon-192.png            rounded "any" icon
+     icon-512.png            rounded "any" icon
+     icon-maskable-512.png   full-bleed, safe-zone artwork (Android adaptive icon)
+     apple-touch-icon.png    full-bleed 180px (iOS)
    Run:  node tools/make-icons.js
-   Pure Node (zlib) — no dependencies. Draws a simple pond + duck badge. */
+   Pure Node (zlib) — no dependencies. */
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
@@ -60,7 +64,7 @@ function blend(px, w, x, y, r, g, b, a) {
 }
 
 function ellipse(px, w, h, cx, cy, rx, ry, color, alpha) {
-  a = alpha == null ? 1 : alpha;
+  const a = alpha == null ? 1 : alpha;
   const x0 = Math.max(0, Math.floor(cx - rx)), x1 = Math.min(w - 1, Math.ceil(cx + rx));
   const y0 = Math.max(0, Math.floor(cy - ry)), y1 = Math.min(h - 1, Math.ceil(cy + ry));
   for (let y = y0; y <= y1; y++) {
@@ -68,54 +72,54 @@ function ellipse(px, w, h, cx, cy, rx, ry, color, alpha) {
       const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
       const d = dx * dx + dy * dy;
       if (d <= 1) {
-        // soft 1px edge
-        const edge = Math.min(1, (1 - d) * 6);
+        const edge = Math.min(1, (1 - d) * 6); // soft 1px edge
         blend(px, w, x, y, color[0], color[1], color[2], a * edge);
       }
     }
   }
 }
 
-function roundedBg(px, w, h, color) {
-  const r = w * 0.18;
+function roundedBg(px, w, h, color, radiusFrac) {
+  const r = w * radiusFrac;
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
-      // rounded-corner mask
       let inside = true;
-      const cx = x < r ? r : (x > w - r ? w - r : x);
-      const cy = y < r ? r : (y > h - r ? h - r : y);
-      const dx = x - cx, dy = y - cy;
-      if (dx * dx + dy * dy > r * r) inside = false;
+      if (r > 0) {
+        const cx = x < r ? r : (x > w - r ? w - r : x);
+        const cy = y < r ? r : (y > h - r ? h - r : y);
+        const dx = x - cx, dy = y - cy;
+        if (dx * dx + dy * dy > r * r) inside = false;
+      }
       if (inside) blend(px, w, x, y, color[0], color[1], color[2], 1);
     }
   }
 }
 
-function makeIcon(size) {
+/* artwork authored in a 512x512 space; k scales it about the centre */
+function makeIcon(size, opts) {
+  const o = opts || {};
   const px = Buffer.alloc(size * size * 4, 0);
   const S = size / 512;
+  const k = o.duckScale == null ? 1 : o.duckScale;
+  const C = 256;
+  const tx = (v) => (C + (v - C) * k) * S;
+  const ty = (v) => (C + (v - C) * k) * S;
+  const tr = (v) => v * k * S;
 
-  // grass background (rounded)
-  roundedBg(px, size, size, [134, 201, 106]); // #86c96a
-  // pond hint
-  ellipse(px, size, size, 256 * S, 372 * S, 190 * S, 96 * S, [143, 216, 232], 0.95);
-
-  // duck body
-  ellipse(px, size, size, 236 * S, 300 * S, 132 * S, 100 * S, [255, 217, 61], 1);
-  // wing
-  ellipse(px, size, size, 214 * S, 306 * S, 74 * S, 58 * S, [246, 185, 59], 1);
-  // head
-  ellipse(px, size, size, 322 * S, 206 * S, 78 * S, 78 * S, [255, 217, 61], 1);
-  // beak
-  ellipse(px, size, size, 402 * S, 216 * S, 46 * S, 24 * S, [255, 159, 67], 1);
-  // eye
-  ellipse(px, size, size, 346 * S, 188 * S, 13 * S, 13 * S, [40, 40, 48], 1);
-  ellipse(px, size, size, 350 * S, 184 * S, 5 * S, 5 * S, [255, 255, 255], 1);
-
+  roundedBg(px, size, size, [134, 201, 106], o.radiusFrac == null ? 0.18 : o.radiusFrac); // #86c96a
+  ellipse(px, size, size, tx(256), ty(372), tr(190), tr(96), [143, 216, 232], 0.95);       // pond
+  ellipse(px, size, size, tx(236), ty(300), tr(132), tr(100), [255, 217, 61], 1);          // body
+  ellipse(px, size, size, tx(214), ty(306), tr(74), tr(58), [246, 185, 59], 1);            // wing
+  ellipse(px, size, size, tx(322), ty(206), tr(78), tr(78), [255, 217, 61], 1);            // head
+  ellipse(px, size, size, tx(402), ty(216), tr(46), tr(24), [255, 159, 67], 1);            // beak
+  ellipse(px, size, size, tx(346), ty(188), tr(13), tr(13), [40, 40, 48], 1);              // eye
+  ellipse(px, size, size, tx(350), ty(184), tr(5), tr(5), [255, 255, 255], 1);             // eye shine
   return encodePng(size, size, px);
 }
 
 const root = path.join(__dirname, '..');
-fs.writeFileSync(path.join(root, 'icon-192.png'), makeIcon(192));
-fs.writeFileSync(path.join(root, 'icon-512.png'), makeIcon(512));
-console.log('wrote icon-192.png and icon-512.png');
+fs.writeFileSync(path.join(root, 'icon-192.png'), makeIcon(192, { radiusFrac: 0.18, duckScale: 1 }));
+fs.writeFileSync(path.join(root, 'icon-512.png'), makeIcon(512, { radiusFrac: 0.18, duckScale: 1 }));
+fs.writeFileSync(path.join(root, 'icon-maskable-512.png'), makeIcon(512, { radiusFrac: 0, duckScale: 0.68 }));
+fs.writeFileSync(path.join(root, 'apple-touch-icon.png'), makeIcon(180, { radiusFrac: 0, duckScale: 0.68 }));
+console.log('wrote icon-192.png, icon-512.png, icon-maskable-512.png, apple-touch-icon.png');
